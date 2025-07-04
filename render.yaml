@@ -1,7 +1,12 @@
 services:
-  - type: web
-    name: nse-scraper
-    env: node
-    buildCommand: npm install
-    startCommand: node server.js
-    plan: free
+- type: web
+  name: nse-scraper
+  runtime: node
+  repo: https://github.com/jagdishuipath/nse-scraper
+  plan: free
+  region: oregon
+  buildCommand: npm install
+  startCommand: node server.js
+  autoDeployTrigger: commit
+  plan: free
+version: "1"
