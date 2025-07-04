@@ -8,5 +8,4 @@ services:
   buildCommand: npm install
   startCommand: node server.js
   autoDeployTrigger: commit
-  plan: free
 version: "1"
