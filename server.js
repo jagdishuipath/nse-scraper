@@ -5,7 +5,11 @@ const app = express();
 
 app.get('/nse-data', async (req, res) => {
   const { symbol, fromDate, toDate } = req.query;
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+	 headless: true,
+	 args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
+
   const page = await browser.newPage();
 
   await page.setExtraHTTPHeaders({
