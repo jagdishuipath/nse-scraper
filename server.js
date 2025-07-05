@@ -6,6 +6,9 @@ const app = express();
 // Global timeout setting
 const TIMEOUT = 60000;
 
+// Increase max listeners to prevent warnings
+process.setMaxListeners(20);
+
 // Add basic error handling middleware
 app.use(express.json());
 
@@ -31,6 +34,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/nse-data', async (req, res) => {
+  let browser = null;
   try {
     const { symbol, fromDate, toDate } = req.query;
     
@@ -41,7 +45,7 @@ app.get('/nse-data', async (req, res) => {
       });
     }
 
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
       headless: true,
       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
       args: [
@@ -80,6 +84,7 @@ app.get('/nse-data', async (req, res) => {
     const data = JSON.parse(body);
 
     await browser.close();
+    browser = null;
     res.json({ data });
   } catch (error) {
     console.error('Error fetching NSE data:', error);
@@ -87,11 +92,37 @@ app.get('/nse-data', async (req, res) => {
       error: 'Failed to fetch NSE data', 
       message: error.message 
     });
+  } finally {
+    // Ensure browser is always closed
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (closeError) {
+        console.error('Error closing browser:', closeError);
+      }
+    }
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    console.log('Process terminated');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  server.close(() => {
+    console.log('Process terminated');
+    process.exit(0);
+  });
 });
 
