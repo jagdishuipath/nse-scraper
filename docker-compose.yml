@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  nse-scraper:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    # Add security options for Puppeteer
+    security_opt:
+      - seccomp:unconfined
+    # Add shared memory for Chrome
+    shm_size: '2gb' 
