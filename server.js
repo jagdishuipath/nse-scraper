@@ -3,6 +3,9 @@ const puppeteer = require('puppeteer');
 const express = require('express');
 const app = express();
 
+// Global timeout setting
+const TIMEOUT = 60000;
+
 // Add basic error handling middleware
 app.use(express.json());
 
@@ -55,6 +58,10 @@ app.get('/nse-data', async (req, res) => {
     });
 
     const page = await browser.newPage();
+    
+    // Set global timeout for page operations
+    page.setDefaultTimeout(TIMEOUT);
+    page.setDefaultNavigationTimeout(TIMEOUT);
 
     await page.setExtraHTTPHeaders({
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
@@ -65,7 +72,10 @@ app.get('/nse-data', async (req, res) => {
 
     const url = `https://www.nseindia.com/api/historicalOR/generateSecurityWiseHistoricalData?from=${fromDate}&to=${toDate}&symbol=${symbol}&type=priceVolumeDeliverable&series=ALL`;
 
-    const response = await page.goto(url, { waitUntil: 'networkidle0' });
+    const response = await page.goto(url, { 
+      waitUntil: 'networkidle0',
+      timeout: TIMEOUT 
+    });
     const body = await response.text();
     const data = JSON.parse(body);
 
