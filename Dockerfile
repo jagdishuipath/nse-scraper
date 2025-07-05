@@ -73,5 +73,8 @@ USER pptruser
 # Expose port
 EXPOSE 3000
 
+# Set Node.js memory limit and garbage collection
+ENV NODE_OPTIONS="--max-old-space-size=512 --gc-interval=100"
+
 # Start the application
-CMD ["npm", "start"] 
+CMD ["node", "server.js"] 

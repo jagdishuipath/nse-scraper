@@ -9,6 +9,9 @@ const TIMEOUT = 60000;
 // Increase max listeners to prevent warnings
 process.setMaxListeners(20);
 
+// Set memory management
+process.env.UV_THREADPOOL_SIZE = 4;
+
 // Add basic error handling middleware
 app.use(express.json());
 
@@ -57,7 +60,12 @@ app.get('/nse-data', async (req, res) => {
         '--no-zygote',
         '--single-process',
         '--disable-web-security',
-        '--disable-features=VizDisplayCompositor'
+        '--disable-features=VizDisplayCompositor',
+        '--memory-pressure-off',
+        '--max_old_space_size=256',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding'
       ]
     });
 
@@ -124,5 +132,16 @@ process.on('SIGINT', () => {
     console.log('Process terminated');
     process.exit(0);
   });
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
 

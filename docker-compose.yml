@@ -12,4 +12,7 @@ services:
     security_opt:
       - seccomp:unconfined
     # Add shared memory for Chrome
-    shm_size: '2gb' 
+    shm_size: '1gb'
+    # Add memory limits
+    mem_limit: '1g'
+    mem_reservation: '512m' 
