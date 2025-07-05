@@ -1,11 +1,11 @@
 services:
 - type: web
   name: nse-scraper
-  runtime: node
+  runtime: docker
   repo: https://github.com/jagdishuipath/nse-scraper
   plan: free
   region: oregon
-  buildCommand: npm install
-  startCommand: node server.js
+  envVars:
+    - key: NODE_ENV
+      value: production
   autoDeployTrigger: commit
-version: "1"

@@ -62,3 +62,28 @@ npm start
 ```
 
 The server will run on `http://localhost:3000`
+
+## Deployment on Render.com
+
+This application is configured for deployment on Render.com using Docker.
+
+### Automatic Deployment
+1. Connect your GitHub repository to Render.com
+2. The `render.yaml` file will automatically configure the deployment
+3. Render will use the Dockerfile to build and deploy your application
+
+### Manual Deployment
+If you prefer manual deployment:
+1. Create a new Web Service on Render.com
+2. Select "Docker" as the runtime
+3. Connect your GitHub repository
+4. Render will automatically detect the Dockerfile and deploy
+
+### Environment Variables
+The following environment variables are automatically set:
+- `NODE_ENV=production`
+- `PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true`
+- `PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium`
+
+### Health Check
+Render.com will automatically check the `/health` endpoint to ensure your service is running properly.

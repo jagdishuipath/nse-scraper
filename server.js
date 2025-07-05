@@ -8,7 +8,23 @@ app.use(express.json());
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    service: 'NSE Scraper API',
+    version: '1.0.0'
+  });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'NSE Scraper API is running',
+    endpoints: {
+      health: '/health',
+      nseData: '/nse-data?symbol=SYMBOL&fromDate=DD-MM-YYYY&toDate=DD-MM-YYYY'
+    }
+  });
 });
 
 app.get('/nse-data', async (req, res) => {
@@ -24,7 +40,7 @@ app.get('/nse-data', async (req, res) => {
 
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: '/usr/bin/google-chrome-stable',
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
       args: [
         '--no-sandbox', 
         '--disable-setuid-sandbox',
@@ -32,7 +48,9 @@ app.get('/nse-data', async (req, res) => {
         '--disable-gpu',
         '--no-first-run',
         '--no-zygote',
-        '--single-process'
+        '--single-process',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor'
       ]
     });
 
